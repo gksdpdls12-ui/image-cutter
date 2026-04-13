@@ -286,6 +286,59 @@ export default function App() {
 
           <div className="h-px bg-slate-100" />
 
+          {/* Cut position pixel editor */}
+          {imageEl && cutPos.length > 0 && (
+            <>
+              <section className="p-5 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">컷 위치 픽셀 직접 입력</p>
+                  <span className="text-xs text-slate-400">{cutPos.length}개 컷라인</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {cutPos.map((pos, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-7 h-7 flex items-center justify-center rounded-md flex-shrink-0"
+                        style={{ background:'#EF4444' }}>
+                        <span style={{ color:'#fff', fontSize:10, fontWeight:800, letterSpacing:'0.03em' }}>
+                          {String(idx+1).padStart(2,'0')}
+                        </span>
+                      </div>
+                      <div className="flex-1 flex items-center h-9 border border-slate-200 rounded-lg bg-slate-50 px-3 gap-2 focus-within:border-blue-400 focus-within:bg-white transition-colors">
+                        <input
+                          type="number"
+                          value={pos}
+                          min={1}
+                          max={imageEl.naturalHeight - 1}
+                          onChange={e => {
+                            const v = parseInt(e.target.value)
+                            if (isNaN(v)) return
+                            const clamped = clamp(v, 1, imageEl.naturalHeight - 1)
+                            setCutPos(prev => {
+                              const next = [...prev]
+                              next[idx] = clamped
+                              return [...next].sort((a, b) => a - b)
+                            })
+                            setManualMode(true)
+                          }}
+                          className="flex-1 text-sm font-bold text-slate-800 bg-transparent outline-none min-w-0"
+                        />
+                        <span className="text-xs text-slate-400 flex-shrink-0">px</span>
+                      </div>
+                      <div className="text-xs text-slate-400 flex-shrink-0 w-12 text-right">
+                        {((pos / imageEl.naturalHeight) * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  값을 수정하면 자동으로 수동 조정 모드로 전환됩니다.<br/>
+                  범위: 1 ~ {(imageEl.naturalHeight - 1).toLocaleString()}px
+                </p>
+              </section>
+              <div className="h-px bg-slate-100" />
+            </>
+          )}
+
           {/* Output settings */}
           <section className="p-5 flex flex-col gap-4">
             <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">출력 설정</p>
